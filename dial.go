@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	_ Dialer = defaultDialer{}
+	_ Dialer = DefaultDialer{}
 )
 
 // Dialer is the dialer interface. It can be used to obtain more control over
@@ -17,20 +17,20 @@ type Dialer interface {
 	DialTimeout(network, address string, timeout time.Duration) (net.Conn, error)
 }
 
-type defaultDialer struct {
+type DefaultDialer struct {
 	d net.Dialer
 }
 
-func (d defaultDialer) Dial(network, address string) (net.Conn, error) {
+func (d DefaultDialer) Dial(network, address string) (net.Conn, error) {
 	return d.d.Dial(network, address)
 }
 
-func (d defaultDialer) DialTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
+func (d DefaultDialer) DialTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	return d.DialContext(ctx, network, address)
 }
 
-func (d defaultDialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+func (d DefaultDialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return d.d.DialContext(ctx, network, address)
 }

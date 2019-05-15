@@ -39,7 +39,7 @@ func (c *Connector) Driver() driver.Driver {
 // dsn format:
 //	hive://user@host:port?batch=100
 func NewConnector(dsn string) (*Connector, error) {
-	return NewConnectorWithDialer(defaultDialer{}, dsn)
+	return NewConnectorWithDialer(DefaultDialer{}, dsn)
 }
 
 func NewConnectorWithDialer(d Dialer, dsn string) (*Connector, error) {
@@ -70,7 +70,7 @@ func NewConnectorWithDialer(d Dialer, dsn string) (*Connector, error) {
 // Most users should only use it through database/sql package from the standard
 // library.
 func Open(dsn string) (driver.Conn, error) {
-	return DialOpen(defaultDialer{}, dsn)
+	return DialOpen(DefaultDialer{}, dsn)
 }
 
 func DialOpen(d Dialer, dsn string) (driver.Conn, error) {
