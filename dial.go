@@ -2,6 +2,7 @@ package hive
 
 import (
 	"context"
+	"crypto/tls"
 	"net"
 	"time"
 )
@@ -37,4 +38,12 @@ func (d DialWrapper) DialTimeout(network, address string, timeout time.Duration)
 
 func (d DialWrapper) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return d.Dialer.DialContext(ctx, network, address)
+}
+
+type TLSDialer struct {
+	*tls.Config
+}
+
+func (d TLSDialer) Dial(network, address string) (net.Conn, error) {
+	return tls.Dial(network, address, d.Config)
 }
