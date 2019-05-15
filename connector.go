@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
+	"net"
 	"net/url"
 	"strings"
 
@@ -39,7 +40,7 @@ func (c *Connector) Driver() driver.Driver {
 // dsn format:
 //	hive://user@host:port?batch=100
 func NewConnector(dsn string) (*Connector, error) {
-	return NewConnectorWithDialer(DefaultDialer{}, dsn)
+	return NewConnectorWithDialer(DialWrapper{}, dsn)
 }
 
 func NewConnectorWithDialer(d Dialer, dsn string) (*Connector, error) {
@@ -70,7 +71,7 @@ func NewConnectorWithDialer(d Dialer, dsn string) (*Connector, error) {
 // Most users should only use it through database/sql package from the standard
 // library.
 func Open(dsn string) (driver.Conn, error) {
-	return DialOpen(DefaultDialer{}, dsn)
+	return DialOpen(DialWrapper{}, dsn)
 }
 
 func DialOpen(d Dialer, dsn string) (driver.Conn, error) {
@@ -83,7 +84,13 @@ func DialOpen(d Dialer, dsn string) (driver.Conn, error) {
 }
 
 func (c *Connector) connect(ctx context.Context) (*Connection, error) {
-	conn, err := c.dialer.DialTimeout("tcp", c.opts.Host, c.opts.Timeout)
+	var conn net.Conn
+	var err error
+	if timeoutDialer, ok := c.dialer.(TimeoutDialer); ok {
+		conn, err = timeoutDialer.DialTimeout("tcp", c.opts.Host, c.opts.Timeout)
+	} else {
+		conn, err = c.dialer.Dial("tcp", c.opts.Host)
+	}
 	if err != nil {
 		return nil, err
 	}
