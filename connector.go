@@ -39,6 +39,10 @@ func (c *Connector) Driver() driver.Driver {
 // dsn format:
 //	hive://user@host:port?batch=100
 func NewConnector(dsn string) (*Connector, error) {
+	return NewConnectorWithDialer(defaultDialer{}, dsn)
+}
+
+func NewConnectorWithDialer(d Dialer, dsn string) (*Connector, error) {
 	u, err := url.Parse(dsn)
 	if err != nil {
 		return nil, err
@@ -57,18 +61,18 @@ func NewConnector(dsn string) (*Connector, error) {
 	}
 
 	return &Connector{
-		dialer: defaultDialer{},
+		dialer: d,
 		opts:   opts,
 	}, nil
-}
-
-func Open(dsn string) (driver.Conn, error) {
-	return DialOpen(defaultDialer{}, dsn)
 }
 
 // Open opens a new connection to the database. dsn is a connection string.
 // Most users should only use it through database/sql package from the standard
 // library.
+func Open(dsn string) (driver.Conn, error) {
+	return DialOpen(defaultDialer{}, dsn)
+}
+
 func DialOpen(d Dialer, dsn string) (driver.Conn, error) {
 	c, err := NewConnector(dsn)
 	if err != nil {
