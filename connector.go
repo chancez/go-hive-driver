@@ -86,7 +86,7 @@ func DialOpen(d Dialer, dsn string) (driver.Conn, error) {
 func (c *Connector) connect(ctx context.Context) (*Connection, error) {
 	var conn net.Conn
 	var err error
-	if timeoutDialer, ok := c.dialer.(TimeoutDialer); ok {
+	if timeoutDialer, ok := c.dialer.(TimeoutDialer); ok && c.opts.Timeout != 0 {
 		conn, err = timeoutDialer.DialTimeout("tcp", c.opts.Host, c.opts.Timeout)
 	} else {
 		conn, err = c.dialer.Dial("tcp", c.opts.Host)
