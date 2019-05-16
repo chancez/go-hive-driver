@@ -1,10 +1,13 @@
 package hive
 
 import (
+	"errors"
 	"net/url"
 	"strconv"
 	"time"
 )
+
+var ErrNoPassword = errors.New("hive: password is required")
 
 type ConnectOptions struct {
 	Host      string
