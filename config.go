@@ -22,15 +22,20 @@ func connectOptionsFromURL(u *url.URL) (ConnectOptions, error) {
 	queryParams := u.Query()
 
 	opts.AuthMode = queryParams.Get("auth")
-	if batchSize, err := strconv.ParseInt(queryParams.Get("batch"), 10, 64); err != nil {
-		return ConnectOptions{}, err
-	} else {
-		opts.BatchSize = batchSize
+
+	if batchSizeParam := queryParams.Get("batch"); batchSizeParam != "" {
+		var err error
+		if opts.BatchSize, err = strconv.ParseInt(batchSizeParam, 10, 64); err != nil {
+			return ConnectOptions{}, err
+		}
 	}
-	if timeoutSeconds, err := strconv.ParseInt(queryParams.Get("connect_timeout"), 10, 0); err != nil {
-		return ConnectOptions{}, err
-	} else {
-		opts.Timeout = time.Duration(timeoutSeconds) * time.Second
+
+	if timeoutParam := queryParams.Get("connect_timeout"); timeoutParam != "" {
+		if timeoutSeconds, err := strconv.ParseInt(timeoutParam, 10, 0); err != nil {
+			return ConnectOptions{}, err
+		} else {
+			opts.Timeout = time.Duration(timeoutSeconds) * time.Second
+		}
 	}
 
 	switch opts.AuthMode {
