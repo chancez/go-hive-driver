@@ -104,10 +104,6 @@ func (c *Connector) connect(ctx context.Context) (*Connection, error) {
 		})
 	}
 
-	if err := transport.Open(); err != nil {
-		return nil, err
-	}
-
 	protocol := thrift.NewTBinaryProtocolTransport(transport)
 	tclient := thrift.NewTStandardClient(protocol, protocol)
 	service := thriftlib.NewTCLIServiceClient(tclient)
